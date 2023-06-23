@@ -1,0 +1,10 @@
+﻿  GameCore.cpp
+  GPlayerActor.cpp
+  main.cpp
+  ProcessEvents.cpp
+  SpawnScene.cpp
+  Génération de code en cours
+  Previous IPDB not found, fall back to full compilation.
+  All 482 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Fin de la génération du code
+  SFML_Iso.vcxproj -> D:\SFML_Iso\x64\Release\SFML_Iso.exe

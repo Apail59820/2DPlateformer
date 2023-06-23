@@ -1,0 +1,96 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Fichiers sources">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Fichiers d%27en-tête">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Fichiers de ressources">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Fichiers d%27en-tête\Events">
+      <UniqueIdentifier>{e52b6424-7211-4583-9b7f-f3901fe1b70f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers d%27en-tête\Player">
+      <UniqueIdentifier>{58c0b153-42fe-4543-8fd3-756d8f53f040}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\Player">
+      <UniqueIdentifier>{56159c65-dde0-47ef-9948-698e2da93c94}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\Events">
+      <UniqueIdentifier>{828fc966-15f9-42dd-8b8e-74a4b6284c7b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\Animation">
+      <UniqueIdentifier>{f0722674-2ac5-4cb2-8f29-4e1841aaf314}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers d%27en-tête\GameScenes">
+      <UniqueIdentifier>{e2326d4f-5b46-4eeb-a2fc-3e34c9cd150d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\GameScenes">
+      <UniqueIdentifier>{6751913e-27fb-4ea7-8b4f-6444a9d082c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers d%27en-tête\Debug">
+      <UniqueIdentifier>{89638351-2710-4dcb-b0e6-c4d9bad836b0}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="GameCore.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="GPlayerActor.cpp">
+      <Filter>Fichiers sources\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="ProcessEvents.cpp">
+      <Filter>Fichiers sources\Events</Filter>
+    </ClCompile>
+    <ClCompile Include="SpawnScene.cpp">
+      <Filter>Fichiers sources\GameScenes</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="GameCore.hpp">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="ProcessEvents.hpp">
+      <Filter>Fichiers d%27en-tête\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="GActor.hpp">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="GPlayerActor.hpp">
+      <Filter>Fichiers d%27en-tête\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="GPlayerActorAnim_structs.hpp">
+      <Filter>Fichiers sources\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="GAnimation.hpp">
+      <Filter>Fichiers sources\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="GameScene.hpp">
+      <Filter>Fichiers d%27en-tête\GameScenes</Filter>
+    </ClInclude>
+    <ClInclude Include="SpawnScene.hpp">
+      <Filter>Fichiers d%27en-tête\GameScenes</Filter>
+    </ClInclude>
+    <ClInclude Include="Scenes.hpp">
+      <Filter>Fichiers d%27en-tête\GameScenes</Filter>
+    </ClInclude>
+    <ClInclude Include="Debug.hpp">
+      <Filter>Fichiers d%27en-tête\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="EventManager.hpp">
+      <Filter>Fichiers d%27en-tête\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils.hpp">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
