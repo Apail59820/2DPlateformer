@@ -40,8 +40,13 @@ private :
 	sf::Vector2i m_spriteOccurences;
 
 	bool m_bIsMoving;
-	bool m_bStoppedMoving; // For animations to play correctly
-	bool m_bStartedMoving; // For animations to play correctly
+	int m_currentAttack;
+
+
+	bool m_bStoppedMoving;   //////////////////
+	bool m_bStartedMoving;   // For Animation to play correctly
+	bool m_bIsAttacking;     //////////////////
+
 
 	float m_moveSpeed;
 	float m_currentSpeed;
@@ -53,4 +58,5 @@ private :
 	sf::Vector2i m_currentAnimFramePos;
 
 	sf::Clock m_animClock;
+	sf::Clock m_timeSinceLastAttack;
 };

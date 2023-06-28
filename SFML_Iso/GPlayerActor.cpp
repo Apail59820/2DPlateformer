@@ -2,15 +2,18 @@
 
 GPlayerActor::GPlayerActor()
 {
-	m_currentAnimation = &GPlayerActor_Anim::IDLE;
+	m_currentAnimation = &GPlayerActor_Anim::ATK3;
 	m_previousAnimation = nullptr;
 	m_currentSpeed = 0.0f;
 	m_moveSpeed = 0.005f;
 	m_maxSpeed = 0.05f;
 
+	m_currentAttack = 0;
+
 	m_bIsMoving = false;
 	m_bStoppedMoving = true;
 	m_bStartedMoving = false;
+	m_bIsAttacking = false;
 
 	m_movementDirection = P_MOVE_RIGHT;
 
@@ -52,6 +55,12 @@ void GPlayerActor::Init()
 
 void GPlayerActor::Update()
 { 
+	if (m_timeSinceLastAttack.getElapsedTime().asMilliseconds() >= 1200)
+	{
+		m_currentAttack = 0;
+		m_timeSinceLastAttack.restart();
+	}
+
 	ProcessPlayerInputEvents();
 	PlayAnimation();
 	Move();
@@ -71,6 +80,7 @@ void GPlayerActor::PlayAnimation()
 
 	if (m_animationQueue.size() && m_currentAnimation->IsSkippable)
 	{
+
 		m_currentAnimation = m_animationQueue[0];
 		m_animationQueue.erase(m_animationQueue.begin());
 		m_currentAnimFrame = m_currentAnimation->Start;
@@ -146,7 +156,8 @@ void GPlayerActor::ProcessPlayerInputEvents()
 	if (EventManager::KeyboardEvent->KeyPressed)
 	{
 		if (EventManager::KeyboardEvent->KeyCode == sf::Keyboard::E)
-			Attack();
+			if (!m_bIsMoving)
+				Attack();
 	}
 }
 
@@ -154,7 +165,7 @@ void GPlayerActor::Move()
 {
 	m_currentSpeed = utils::Lerp(m_currentSpeed, m_maxSpeed, this->m_moveSpeed);
 
-	
+
 
 	if (!m_bIsMoving)
 	{
@@ -178,7 +189,7 @@ void GPlayerActor::Move()
 		m_currentAnimFrame = m_currentAnimation->Start;
 		m_bStartedMoving = true;
 	}
-	
+
 
 	switch (m_movementDirection)
 	{
@@ -190,7 +201,7 @@ void GPlayerActor::Move()
 		m_sprite.move(m_currentSpeed, 0.0f);
 		m_sprite.setScale(1.0f, 1.0f);
 		break;
-	default : 
+	default:
 		Dbg::Log("[-] [GPlayerActor::Move]\t:\tUnknown value for \'_dir\'");
 		break;
 	}
@@ -198,14 +209,21 @@ void GPlayerActor::Move()
 
 void GPlayerActor::Attack()
 {
-	if (m_currentAnimation == &GPlayerActor_Anim::ATK1) {
-		m_animationQueue.push_back(&GPlayerActor_Anim::ATK2);
+	if (m_timeSinceLastAttack.getElapsedTime().asMilliseconds() >= 200)
+	{
+		if (m_currentAttack == 0 || m_currentAttack == 2)
+		{
+			m_currentAttack = 1;
+			m_currentAnimation = &GPlayerActor_Anim::ATK1;
+			m_currentAnimFrame = m_currentAnimation->Start;
+			m_timeSinceLastAttack.restart();
+		} 
+		else if (m_currentAttack == 1)
+		{
+			m_currentAnimation = &GPlayerActor_Anim::ATK2;
+			m_currentAnimFrame = m_currentAnimation->Start;
+			m_currentAttack = 2;
+			m_timeSinceLastAttack.restart();
+		}
 	}
-	else if (m_currentAnimation == &GPlayerActor_Anim::ATK2) {
-		m_animationQueue.push_back(&GPlayerActor_Anim::ATK3);
-	}
-	else {
-		m_animationQueue.push_back(&GPlayerActor_Anim::ATK1);
-	}
-	
 }

@@ -21,7 +21,7 @@ namespace GPlayerActor_Anim
 
 	inline GAnim ATK1			{ 42, 47, false, false, false, GPlayerActor_AnimStates::Atk1, true };
 	inline GAnim ATK2			{ 48, 52, false, false, false, GPlayerActor_AnimStates::Atk2, true };
-	inline GAnim ATK3			{ 55, 58, false, false, false, GPlayerActor_AnimStates::Atk3, true };
+	inline GAnim ATK3			{ 55, 58, false, false, false, GPlayerActor_AnimStates::Atk3, false };
 
 	inline GAnim JUMP			{ 16, 23, false, false, false, GPlayerActor_AnimStates::Jump, false };
 	  
@@ -51,6 +51,9 @@ namespace GPlayerActor_AnimSequence
 			break;
 		case GPlayerActor_AnimStates::Jump:
 			return &GPlayerActor_Anim::PREVIOUS_STATE;
+			break;
+		case GPlayerActor_AnimStates::SwordIdle:
+			return &GPlayerActor_Anim::SWORD_SHEATHE;
 			break;
 		default:
 			Dbg::Log("[GPlayerActor_AnimSequence::GetNextAnim]\t:\tCurrent State is Loopable, switching to IDLE state.");
