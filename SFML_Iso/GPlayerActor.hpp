@@ -4,12 +4,16 @@
 #include <string>
 #include <vector>
 
+#include <SFML/Audio.hpp>
+
+
 #include "GActor.hpp"
 #include "GPlayerActorAnim_structs.hpp"
 
 #include "Debug.hpp"
 #include "EventManager.hpp"
 #include "Utils.hpp"
+#include "GWorld.h"
 
 class GPlayerActor : public GActor
 {
@@ -28,9 +32,14 @@ private :
 
 	void PlayAnimation();
 	void ProcessPlayerInputEvents();
+	void CheckCollisions();
 
 	void Attack();
 	void Move();
+
+	sf::SoundBuffer m_sSwordSwoosh[3];
+	sf::Sound m_sSound_Emitter;
+
 
 	GAnim * m_currentAnimation, *m_previousAnimation;
 	std::vector<GAnim*> m_animationQueue;
@@ -52,6 +61,10 @@ private :
 	float m_currentSpeed;
 	float m_maxSpeed;
 
+	float m_gravityForce;
+	float m_currentGravityForceApplied;
+	float m_maxGravityForceApplication;
+
 	Dir m_movementDirection;
 
 	int m_currentAnimFrame;
@@ -59,4 +72,6 @@ private :
 
 	sf::Clock m_animClock;
 	sf::Clock m_timeSinceLastAttack;
+
+	sf::RectangleShape m_collisionBox;
 };

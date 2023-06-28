@@ -2,11 +2,16 @@
 
 GPlayerActor::GPlayerActor()
 {
-	m_currentAnimation = &GPlayerActor_Anim::ATK3;
+	m_currentAnimation = &GPlayerActor_Anim::JUMP;
 	m_previousAnimation = nullptr;
+
 	m_currentSpeed = 0.0f;
 	m_moveSpeed = 0.005f;
 	m_maxSpeed = 0.05f;
+
+	m_currentGravityForceApplied = 0.0f;
+	m_gravityForce = 0.002f;
+	m_maxGravityForceApplication = 0.07f;
 
 	m_currentAttack = 0;
 
@@ -37,10 +42,20 @@ GPlayerActor::~GPlayerActor()
 void GPlayerActor::Init()
 {
 	std::string t_TexturePath = "../Assets/Player/psheet.png";
-	if (!m_texture.loadFromFile(t_TexturePath))
+	std::string s_SoundBufferPaths[3] = {"../Assets/Sounds/sword_swoosh_01.mp3",
+		                                 "../Assets/Sounds/sword_swoosh_02.mp3",
+		                                 "../Assets/Sounds/sword_swoosh_03.mp3" };
+
+	for (auto i = 0; i < 3; ++i)
 	{
-		Dbg::Log("[GPlayerActor.Init]     :     Could not load texture (\'%s\').", t_TexturePath);
+		if (!m_sSwordSwoosh[i].loadFromFile(s_SoundBufferPaths[i])) {
+			Dbg::Log("[GPlayerActor.Init]     :     Could not load sound (\'%s\').", s_SoundBufferPaths[i]);
+		}
 	}
+
+	if (!m_texture.loadFromFile(t_TexturePath))
+		Dbg::Log("[GPlayerActor.Init]     :     Could not load texture (\'%s\').", t_TexturePath);
+
 
 	m_sprite.setPosition(sf::Vector2f(100, 100));
 	m_sprite.setOrigin(sf::Vector2f(static_cast<float>(m_spriteSize.x) / 2, static_cast<float>(m_spriteSize.y) / 2));
@@ -50,6 +65,11 @@ void GPlayerActor::Init()
 	m_sprite.setTextureRect(sf::IntRect((m_spriteSize.x * GPlayerActor_Anim::IDLE.Start),
 		                                (m_spriteSize.y * abs(GPlayerActor_Anim::IDLE.Start / m_spriteOccurences.x)), 
 		                                 m_spriteSize.x, m_spriteSize.y));
+
+	m_collisionBox.setSize(sf::Vector2f(18,29));
+
+	m_collisionBox.setFillColor(sf::Color(0, 0, 0, 0));
+	m_collisionBox.setOutlineColor(sf::Color(0, 0, 0, 0));
 
 }
 
@@ -61,6 +81,12 @@ void GPlayerActor::Update()
 		m_timeSinceLastAttack.restart();
 	}
 
+	m_collisionBox.setPosition(
+	sf::Vector2f(m_sprite.getPosition().x - 10,
+				 m_sprite.getPosition().y - 11)
+	);
+
+
 	ProcessPlayerInputEvents();
 	PlayAnimation();
 	Move();
@@ -69,6 +95,7 @@ void GPlayerActor::Update()
 void GPlayerActor::Render()
 {
 	m_window->draw(m_sprite);
+	m_window->draw(m_collisionBox);
 }
 
 void GPlayerActor::PlayAnimation()
@@ -161,11 +188,26 @@ void GPlayerActor::ProcessPlayerInputEvents()
 	}
 }
 
+void GPlayerActor::CheckCollisions()
+{
+	for (auto& obj : NGWorld::WorldObjects) {
+		if (obj->GetCollision().intersects(m_collisionBox.getGlobalBounds()))
+		{
+			//collision
+		}
+	}
+}
+
 void GPlayerActor::Move()
 {
-	m_currentSpeed = utils::Lerp(m_currentSpeed, m_maxSpeed, this->m_moveSpeed);
+	m_currentSpeed = utils::Lerp(m_currentSpeed, m_maxSpeed, m_moveSpeed);
+	m_currentGravityForceApplied = utils::Lerp(m_currentGravityForceApplied, m_maxGravityForceApplication, m_gravityForce);
 
+	if (m_currentGravityForceApplied > m_maxGravityForceApplication) {
+		m_currentGravityForceApplied = m_maxGravityForceApplication;
+	}
 
+	//m_sprite.move(0, m_currentGravityForceApplied);  // apply gravity
 
 	if (!m_bIsMoving)
 	{
@@ -177,7 +219,7 @@ void GPlayerActor::Move()
 			m_bStartedMoving = false;
 		}
 
-		m_currentSpeed > 0.2f ? this->m_currentSpeed -= this->m_moveSpeed : this->m_currentSpeed = 0;
+		m_currentSpeed > 0.2f ? m_currentSpeed -= m_moveSpeed : m_currentSpeed = 0;
 		return;
 	}
 
@@ -216,6 +258,8 @@ void GPlayerActor::Attack()
 			m_currentAttack = 1;
 			m_currentAnimation = &GPlayerActor_Anim::ATK1;
 			m_currentAnimFrame = m_currentAnimation->Start;
+			m_sSound_Emitter.setBuffer(m_sSwordSwoosh[std::rand() % 3 ]);
+			m_sSound_Emitter.play();
 			m_timeSinceLastAttack.restart();
 		} 
 		else if (m_currentAttack == 1)
@@ -223,6 +267,8 @@ void GPlayerActor::Attack()
 			m_currentAnimation = &GPlayerActor_Anim::ATK2;
 			m_currentAnimFrame = m_currentAnimation->Start;
 			m_currentAttack = 2;
+			m_sSound_Emitter.setBuffer(m_sSwordSwoosh[std::rand() % 3]);
+			m_sSound_Emitter.play();
 			m_timeSinceLastAttack.restart();
 		}
 	}
