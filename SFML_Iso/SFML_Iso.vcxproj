@@ -101,16 +101,16 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>D:\SFML_Iso\SFML\SFML_INCLUDES\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ConformanceMode>false</ConformanceMode>
+      <AdditionalIncludeDirectories>D:\SFML_Iso\SFML\SFML_INCLUDES\include;D:\SFML_Iso\TmxLoader\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>sfml-audio-d.lib;sfml-graphics-d.lib;sfml-main-d.lib;sfml-network-d.lib;sfml-system-d.lib;sfml-window-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>sfml-audio-d.lib;sfml-graphics-d.lib;sfml-main-d.lib;sfml-network-d.lib;sfml-system-d.lib;sfml-window-d.lib;zlibd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>D:\SFML_Iso\SFML\SFML_LIB;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -140,6 +140,15 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ProcessEvents.cpp" />
     <ClCompile Include="SpawnScene.cpp" />
+    <ClCompile Include="Tmxloader\DebugShape.cpp" />
+    <ClCompile Include="Tmxloader\Log.cpp" />
+    <ClCompile Include="Tmxloader\MapLayer.cpp" />
+    <ClCompile Include="Tmxloader\MapLoaderPrivate.cpp" />
+    <ClCompile Include="Tmxloader\MapLoaderPublic.cpp" />
+    <ClCompile Include="Tmxloader\MapObject.cpp" />
+    <ClCompile Include="Tmxloader\miniz.c" />
+    <ClCompile Include="Tmxloader\pugixml\pugixml.cpp" />
+    <ClCompile Include="Tmxloader\QuadTreeNode.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Debug.hpp" />
@@ -150,9 +159,11 @@
     <ClInclude Include="GAnimation.hpp" />
     <ClInclude Include="GPlayerActor.hpp" />
     <ClInclude Include="GPlayerActorAnim_structs.hpp" />
+    <ClInclude Include="GWorld.h" />
     <ClInclude Include="ProcessEvents.hpp" />
     <ClInclude Include="Scenes.hpp" />
     <ClInclude Include="SpawnScene.hpp" />
+    <ClInclude Include="Tmxloader\miniz.h" />
     <ClInclude Include="Utils.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

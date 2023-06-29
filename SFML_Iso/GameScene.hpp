@@ -4,13 +4,13 @@
 #include <vector>
 #include <map>
 
+#include <tmx/MapLoader.hpp>
+
 #include "Debug.hpp"
 
 class GScene
 {
 public :
-	
-	enum Action { Attack, UseItem };
 
 	virtual ~GScene()
 	{
@@ -23,16 +23,16 @@ public :
 
 	virtual void LoadActors() = 0;
 
-	virtual void SetWindowRef(sf::RenderWindow* _window)
+	void SetWindowRef(sf::RenderWindow* _window)
 	{
 		m_window = _window;
 	}
 
 protected : 
 
-	std::map<sf::Keyboard::Key, Action> m_keyBindings;
-
 	std::vector<std::shared_ptr<GActor>> m_gameActors;
 
 	sf::RenderWindow* m_window;
+
+	std::shared_ptr<tmx::MapLoader> m_mapLoader;
 };

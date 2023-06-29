@@ -3,9 +3,9 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 
-#include "GWorldObject.hpp"
+#include <tmx/MapLoader.hpp>
 
 namespace NGWorld
 {
-	inline std::vector<GWorldObject*> WorldObjects;
+	inline tmx::MapLoader* GMap;
 }

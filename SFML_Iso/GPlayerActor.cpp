@@ -190,10 +190,17 @@ void GPlayerActor::ProcessPlayerInputEvents()
 
 void GPlayerActor::CheckCollisions()
 {
-	for (auto& obj : NGWorld::WorldObjects) {
-		if (obj->GetCollision().intersects(m_collisionBox.getGlobalBounds()))
+	const auto& layers = NGWorld::GMap->getLayers();
+	bool collision = false;
+
+	for (const auto& layer : layers)
+	{
+		if (layer.name == "Collision")
 		{
-			//collision
+			for (const auto& object : layer.objects)
+			{
+				
+			}
 		}
 	}
 }

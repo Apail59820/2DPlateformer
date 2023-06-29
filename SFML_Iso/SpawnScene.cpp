@@ -13,6 +13,10 @@ SpawnScene::~SpawnScene()
 void SpawnScene::Init()
 {
 	LoadActors();
+
+	m_mapLoader = std::make_shared<tmx::MapLoader>("../Assets/Maps/");
+
+	m_mapLoader->load("test.tmx");
 }
 
 void SpawnScene::Update()
@@ -24,6 +28,9 @@ void SpawnScene::Update()
 
 void SpawnScene::Render()
 {
+
+	m_window->draw(*m_mapLoader);
+
 	for (auto i = 0; i < m_gameActors.size(); ++i) {
 		m_gameActors[i]->Render();
 	}
