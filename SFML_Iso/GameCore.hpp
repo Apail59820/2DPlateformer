@@ -5,6 +5,7 @@
 
 #include "GPlayerActor.hpp"
 #include "Scenes.hpp"
+#include "GWorld.h"
 
 class GameEngineCore
 {
@@ -18,8 +19,6 @@ public :
 	void Render();
 
 	bool IsRunning();
-
-	void LoadScene();
 
 private : 
 

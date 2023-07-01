@@ -23,7 +23,7 @@ namespace GPlayerActor_Anim
 	inline GAnim ATK2			{ 48, 52, false, false, false, GPlayerActor_AnimStates::Atk2, true };
 	inline GAnim ATK3			{ 55, 58, false, false, false, GPlayerActor_AnimStates::Atk3, false };
 
-	inline GAnim JUMP			{ 16, 23, false, false, false, GPlayerActor_AnimStates::Jump, false };
+	inline GAnim JUMP			{ 16, 21, false, false, false, GPlayerActor_AnimStates::Jump, false };
 	  
 	inline GAnim SWORD_DRAW	    { 69, 73, false, false, false,GPlayerActor_AnimStates::SwordDraw, false };
 	inline GAnim SWORD_SHEATHE	{ 74, 76, false, false, false, GPlayerActor_AnimStates::SwordSheathe, false };

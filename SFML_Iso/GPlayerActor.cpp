@@ -1,17 +1,28 @@
 #include "GPlayerActor.hpp"
 
+
+//todo
+/*
+Can't cancel jump animation
+Fall animation
+can't attack while jumping
+*/
+
 GPlayerActor::GPlayerActor()
 {
 	m_currentAnimation = &GPlayerActor_Anim::JUMP;
 	m_previousAnimation = nullptr;
 
-	m_currentSpeed = 0.0f;
+	m_velocity = sf::Vector2f(0.0f, 0.0f);
 	m_moveSpeed = 0.005f;
-	m_maxSpeed = 0.05f;
+	m_maxSpeed = 0.09f;
+	m_jumpForce = 0.005f;
+	m_jumpHeight = 1.9f;
 
+	m_jumpForceApplied = 0.0f;
 	m_currentGravityForceApplied = 0.0f;
 	m_gravityForce = 0.002f;
-	m_maxGravityForceApplication = 0.07f;
+	m_maxGravityForceApplication = 0.15f;
 
 	m_currentAttack = 0;
 
@@ -19,6 +30,8 @@ GPlayerActor::GPlayerActor()
 	m_bStoppedMoving = true;
 	m_bStartedMoving = false;
 	m_bIsAttacking = false;
+	m_bIsJumping = false;
+	m_bWasRunningBeforeJumping = false;
 
 	m_movementDirection = P_MOVE_RIGHT;
 
@@ -66,11 +79,7 @@ void GPlayerActor::Init()
 		                                (m_spriteSize.y * abs(GPlayerActor_Anim::IDLE.Start / m_spriteOccurences.x)), 
 		                                 m_spriteSize.x, m_spriteSize.y));
 
-	m_collisionBox.setSize(sf::Vector2f(18,29));
-
-	m_collisionBox.setFillColor(sf::Color(0, 0, 0, 0));
-	m_collisionBox.setOutlineColor(sf::Color(0, 0, 0, 0));
-
+	m_outerCollisionBox.setSize(sf::Vector2f(10,24));
 }
 
 void GPlayerActor::Update()
@@ -81,11 +90,18 @@ void GPlayerActor::Update()
 		m_timeSinceLastAttack.restart();
 	}
 
-	m_collisionBox.setPosition(
-	sf::Vector2f(m_sprite.getPosition().x - 10,
+	
+	m_outerCollisionBox.setPosition(
+	sf::Vector2f(m_sprite.getPosition().x - 5,
 				 m_sprite.getPosition().y - 11)
 	);
 
+	m_groundedPoint = sf::Vector2f(m_sprite.getPosition().x, m_sprite.getPosition().y + 18);
+
+	if (NGWorld::GMap != nullptr && NGWorld::GMap)
+	{
+		NGWorld::GMap->updateQuadTree(m_outerCollisionBox.getGlobalBounds());
+	}
 
 	ProcessPlayerInputEvents();
 	PlayAnimation();
@@ -95,7 +111,6 @@ void GPlayerActor::Update()
 void GPlayerActor::Render()
 {
 	m_window->draw(m_sprite);
-	m_window->draw(m_collisionBox);
 }
 
 void GPlayerActor::PlayAnimation()
@@ -107,13 +122,12 @@ void GPlayerActor::PlayAnimation()
 
 	if (m_animationQueue.size() && m_currentAnimation->IsSkippable)
 	{
-
 		m_currentAnimation = m_animationQueue[0];
 		m_animationQueue.erase(m_animationQueue.begin());
 		m_currentAnimFrame = m_currentAnimation->Start;
 	}
 
-	if (m_currentAnimFrame != m_currentAnimation->Stop)
+	if (m_currentAnimFrame < m_currentAnimation->Stop)
 		++m_currentAnimFrame;
 	else
 	{
@@ -180,6 +194,10 @@ void GPlayerActor::ProcessPlayerInputEvents()
 		m_bIsMoving = false;
 	}
 
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space))
+		Jump();
+	
 	if (EventManager::KeyboardEvent->KeyPressed)
 	{
 		if (EventManager::KeyboardEvent->KeyCode == sf::Keyboard::E)
@@ -188,45 +206,121 @@ void GPlayerActor::ProcessPlayerInputEvents()
 	}
 }
 
-void GPlayerActor::CheckCollisions()
+bool GPlayerActor::IsColliding()
 {
-	const auto& layers = NGWorld::GMap->getLayers();
-	bool collision = false;
-
-	for (const auto& layer : layers)
+    if (NGWorld::GMap != nullptr && NGWorld::GMap)
 	{
-		if (layer.name == "Collision")
+		const auto& layers = NGWorld::GMap->getLayers();
+
+		for (const auto& layer : layers)
 		{
-			for (const auto& object : layer.objects)
+			if (layer.name == "Collision")
 			{
-				
+				for (const auto& object : layer.objects)
+				{
+					if (object.getAABB().intersects(m_outerCollisionBox.getGlobalBounds()))
+					{
+						return true;
+					}
+				}
 			}
 		}
 	}
+
+	return false;
+}
+
+bool GPlayerActor::IsGrounded()
+{
+	if (NGWorld::GMap != nullptr && NGWorld::GMap)
+	{
+		const auto& layers = NGWorld::GMap->getLayers();
+
+		for (const auto& layer : layers)
+		{
+			if (layer.name == "Collision")
+			{
+				for (const auto& object : layer.objects)
+				{
+					if (object.contains(m_groundedPoint)) {
+						return true;
+					}
+				}
+			}
+		}
+	}
+
+	return false;
 }
 
 void GPlayerActor::Move()
 {
-	m_currentSpeed = utils::Lerp(m_currentSpeed, m_maxSpeed, m_moveSpeed);
-	m_currentGravityForceApplied = utils::Lerp(m_currentGravityForceApplied, m_maxGravityForceApplication, m_gravityForce);
+	if (!IsGrounded() && !m_bIsJumping)
+	{
+		m_currentGravityForceApplied = utils::Lerp(m_currentGravityForceApplied, m_maxGravityForceApplication, m_gravityForce);
 
-	if (m_currentGravityForceApplied > m_maxGravityForceApplication) {
-		m_currentGravityForceApplied = m_maxGravityForceApplication;
+		if (m_currentGravityForceApplied > m_maxGravityForceApplication) {
+			m_currentGravityForceApplied = m_maxGravityForceApplication;
+		}
+
+
+		m_sprite.move(0, m_currentGravityForceApplied);
 	}
+	else
+	{
+		if (m_bIsJumping)
+		{
+			if (!m_bHasJumped)
+			{
+				m_currentAnimation = &GPlayerActor_Anim::JUMP;
+				m_currentAnimFrame = m_currentAnimation->Start;
+				m_bHasJumped = true;
+			}
+			m_jumpForceApplied = utils::Lerp(m_jumpForceApplied, m_jumpHeight, m_jumpForce);
+			m_sprite.move(0, -m_jumpForceApplied);
+			if (m_jumpForceApplied >= m_jumpHeight - 1.0f)
+			{
+				
+				m_jumpForceApplied = 0.0f;
+				m_bIsJumping = false;
+				m_bHasJumped = false;
+				if (m_bWasRunningBeforeJumping)
+				{
+					if (!m_animationQueue.size())
+						m_animationQueue.push_back(&GPlayerActor_Anim::RUN);
+				}
+				else
+				{
+					if (!m_animationQueue.size())
+						m_animationQueue.push_back(&GPlayerActor_Anim::IDLE);
+				}
+			}
+		}
 
-	//m_sprite.move(0, m_currentGravityForceApplied);  // apply gravity
+		m_velocity.y = 0.0f;
+		m_currentGravityForceApplied = .0f;
+	}
 
 	if (!m_bIsMoving)
 	{
 		if (m_currentAnimation != &GPlayerActor_Anim::IDLE && !m_bStoppedMoving)
 		{
-			m_currentAnimation = &GPlayerActor_Anim::IDLE;
-			m_currentAnimFrame = m_currentAnimation->Start;
+			if (m_currentAnimation->IsSkippable)
+			{
+				m_currentAnimation = &GPlayerActor_Anim::IDLE;
+				m_currentAnimFrame = m_currentAnimation->Start;
+				
+			}
+			else
+			{
+				if (!m_animationQueue.size())
+					m_animationQueue.push_back(&GPlayerActor_Anim::IDLE);
+			}
 			m_bStoppedMoving = true;
 			m_bStartedMoving = false;
 		}
 
-		m_currentSpeed > 0.2f ? m_currentSpeed -= m_moveSpeed : m_currentSpeed = 0;
+		m_velocity.x = 0.0f;
 		return;
 	}
 
@@ -234,26 +328,50 @@ void GPlayerActor::Move()
 
 	if (m_currentAnimation != &GPlayerActor_Anim::RUN && !m_bStartedMoving)
 	{
-		m_currentAnimation = &GPlayerActor_Anim::RUN;
-		m_currentAnimFrame = m_currentAnimation->Start;
+		if (m_currentAnimation->IsSkippable)
+		{
+			m_currentAnimation = &GPlayerActor_Anim::RUN;
+			m_currentAnimFrame = m_currentAnimation->Start;
+		}
+		else
+		{
+			if(!m_animationQueue.size())
+				m_animationQueue.push_back(&GPlayerActor_Anim::RUN);
+
+		}
 		m_bStartedMoving = true;
 	}
 
+	m_velocity.x = utils::Lerp(abs(m_velocity.x), m_maxSpeed, m_moveSpeed);
+	
+	//collision prediction
+	m_outerCollisionPreviousPos = m_outerCollisionBox.getPosition();
+	m_outerCollisionBox.move(m_movementDirection == P_MOVE_LEFT ? -m_velocity.x * 4: m_velocity.x * 4, 0.0f);
+	m_bIsColliding = IsColliding();
+	m_outerCollisionBox.setPosition(m_outerCollisionPreviousPos);
+
+
+	if (m_bIsColliding)
+		m_velocity.x = 0.0f;
+		
 
 	switch (m_movementDirection)
 	{
 	case P_MOVE_LEFT:
-		m_sprite.move(-m_currentSpeed, 0.0f);
+		m_velocity.x = -m_velocity.x;
 		m_sprite.setScale(-1.0f, 1.0f);
 		break;
 	case P_MOVE_RIGHT:
-		m_sprite.move(m_currentSpeed, 0.0f);
 		m_sprite.setScale(1.0f, 1.0f);
 		break;
 	default:
 		Dbg::Log("[-] [GPlayerActor::Move]\t:\tUnknown value for \'_dir\'");
 		break;
 	}
+
+
+	
+	m_sprite.move(m_velocity);
 }
 
 void GPlayerActor::Attack()
@@ -278,5 +396,13 @@ void GPlayerActor::Attack()
 			m_sSound_Emitter.play();
 			m_timeSinceLastAttack.restart();
 		}
+	}
+}
+
+void GPlayerActor::Jump()
+{
+	if (!m_bIsJumping && IsGrounded()) {
+		m_bIsJumping = true;
+		m_bWasRunningBeforeJumping = m_bIsMoving;
 	}
 }

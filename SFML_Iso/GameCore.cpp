@@ -18,6 +18,7 @@ void GameEngineCore::Init()
        
     m_currentScene->SetWindowRef(&m_window);
     m_currentScene->Init();
+    NGWorld::GMap = m_currentScene->GetMapLoader();
 }
 
 void GameEngineCore::Update()

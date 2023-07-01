@@ -32,10 +32,12 @@ private :
 
 	void PlayAnimation();
 	void ProcessPlayerInputEvents();
-	void CheckCollisions();
+	bool IsColliding();
+	bool IsGrounded();
 
 	void Attack();
 	void Move();
+	void Jump();
 
 	sf::SoundBuffer m_sSwordSwoosh[3];
 	sf::Sound m_sSound_Emitter;
@@ -48,17 +50,25 @@ private :
 	sf::Vector2i m_spriteSize, m_spriteSheetSize;
 	sf::Vector2i m_spriteOccurences;
 
+	sf::Vector2f m_previousPos, m_outerCollisionPreviousPos;
+
 	bool m_bIsMoving;
+	bool m_bIsGrounded;
+	bool m_bIsColliding;
+	bool m_bIsJumping;
+
 	int m_currentAttack;
 
 
 	bool m_bStoppedMoving;   //////////////////
 	bool m_bStartedMoving;   // For Animation to play correctly
+	bool m_bHasJumped;
+	bool m_bWasRunningBeforeJumping;
 	bool m_bIsAttacking;     //////////////////
 
 
-	float m_moveSpeed;
-	float m_currentSpeed;
+	float m_moveSpeed, m_jumpHeight, m_jumpForce, m_jumpForceApplied;
+	sf::Vector2f m_velocity;
 	float m_maxSpeed;
 
 	float m_gravityForce;
@@ -73,5 +83,7 @@ private :
 	sf::Clock m_animClock;
 	sf::Clock m_timeSinceLastAttack;
 
-	sf::RectangleShape m_collisionBox;
+	sf::RectangleShape m_outerCollisionBox;
+
+	sf::Vector2f m_groundedPoint;
 };

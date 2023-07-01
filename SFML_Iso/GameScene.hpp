@@ -28,6 +28,15 @@ public :
 		m_window = _window;
 	}
 
+	std::shared_ptr<tmx::MapLoader> GetMapLoader() const
+	{
+		if (m_mapLoader != nullptr && m_mapLoader)
+		{
+			return m_mapLoader;
+		}
+
+		return 0;
+	}
 protected : 
 
 	std::vector<std::shared_ptr<GActor>> m_gameActors;

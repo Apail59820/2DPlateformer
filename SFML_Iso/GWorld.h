@@ -7,5 +7,5 @@
 
 namespace NGWorld
 {
-	inline tmx::MapLoader* GMap;
+	inline std::shared_ptr<tmx::MapLoader> GMap;
 }
