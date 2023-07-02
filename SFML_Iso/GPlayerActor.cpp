@@ -1,13 +1,6 @@
 #include "GPlayerActor.hpp"
 
 
-//todo
-/*
-Can't cancel jump animation
-Fall animation
-can't attack while jumping
-*/
-
 GPlayerActor::GPlayerActor()
 {
 	m_currentAnimation = &GPlayerActor_Anim::JUMP;
